@@ -38,5 +38,8 @@ for i in $(prt); do
 	fi
 done
 
-# force dos endings
-type -P u2d &>/dev/null && cat $fil | u2d > $fil
+# windoze line endings
+type -P u2d &> /dev/null && cat $fil | u2d > $fil
+
+# windoze dns flush
+type -P ipconfig &> /dev/null && ipconfig /flushdns
