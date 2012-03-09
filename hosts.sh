@@ -27,7 +27,6 @@ printf '%s\n' ${lst[@]} | sort -uo $cfg
 # build
 pushd $dir > /dev/null
 cat $cfg | tee /dev/stderr | xargs cat local > $hst
-popd > /dev/null
 
 # windows
 type -P u2d &> /dev/null && echo && u2d $(readlink -f $hst)
