@@ -2,10 +2,14 @@
 # hosts: Hosts file switcher.
 # Author: Shannon Moeller <me@shannonmoeller.com>
 
-# locations
-hst=$(readlink -f /etc/hosts)
+# config
+hst=/etc/hosts
 dir=$HOME/.hosts
 cfg=$dir/.config
+
+# verify
+[[ ! -d $dir ]] && mkdir -p $dir
+[[ ! -f $cfg ]] && touch $cfg
 
 # show
 (( ! $# )) && cat $cfg && exit
@@ -26,5 +30,5 @@ cat $cfg | tee /dev/stderr | xargs cat local > $hst
 popd > /dev/null
 
 # windows
-type -P u2d &> /dev/null && echo && u2d $hst
+type -P u2d &> /dev/null && echo && u2d $(readlink -f $hst)
 type -P ipconfig &> /dev/null && ipconfig /flushdns
