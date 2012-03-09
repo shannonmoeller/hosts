@@ -7,8 +7,8 @@ hst=/etc/hosts
 dir=$HOME/.hosts
 cfg=$dir/.config
 
-# verify
-[[ ! -d $dir ]] && mkdir -p $dir
+# setup
+[[ ! -d $dir ]] && mkdir -p $dir && cp $hst $dir/local
 [[ ! -f $cfg ]] && touch $cfg
 
 # show
