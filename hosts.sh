@@ -2,44 +2,29 @@
 # hosts: Hosts file switcher.
 # Author: Shannon Moeller <me@shannonmoeller.com>
 
-dir=~/.hosts
-fil=/etc/hosts
+# locations
+hst=$(readlink -f /etc/hosts)
+dir=$HOME/.hosts
+cfg=$dir/.config
 
-# current hosts list
-lis=( $(sed -n 's/^#@//p' $fil) )
+# show
+(( ! $# )) && cat $cfg && exit
 
-# print sorted list
-prt() {
-	printf '%s\n' ${lis[@]} | sort -u
-}
-
-# print and exit
-(( ! $# )) && prt && exit
-
-# modify hosts list
+# update
+lst=( $(cat $cfg) )
 for i in "$@"; do
 	case "${i:0:1}" in
-		+) lis=( ${lis[@]} ${i:1} );;
-		-) lis=( ${lis[@]/#${i:1}*/} );;
+		+) lst=( ${lst[@]} ${i:1} );;
+		-) lst=( ${lst[@]/#${i:1}*/} );;
 	esac
 done
+printf '%s\n' ${lst[@]} | sort -uo $cfg
 
-# reset hosts file
-cat "$dir/local" > $fil
+# build
+pushd $dir > /dev/null
+cat $cfg | tee /dev/stderr | xargs cat local > $hst
+popd > /dev/null
 
-# append listed hosts files
-for i in $(prt); do
-	if [[ -f "$dir/$i" ]]; then
-		printf '\e[0;32m* %s\e[0m\n' $i
-		printf '#@%s\n' $i >> $fil
-		cat "$dir/$i" >> $fil
-	else
-		printf '\e[0;31m! %s\e[0m\n' $i
-	fi
-done
-
-# windoze line endings
-type -P u2d &> /dev/null && cat $fil | u2d > $fil
-
-# windoze dns flush
+# windows
+type -P u2d &> /dev/null && echo && u2d $hst
 type -P ipconfig &> /dev/null && ipconfig /flushdns
